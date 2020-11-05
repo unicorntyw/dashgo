@@ -4,13 +4,44 @@
   <include file="$(find dashgo_bringup)/launch/bringup_smoother.launch" />
   <include file="$(find dashgo_description)/launch/dashgo_description.launch"/>
 
-  <include file="$(find dashgo_nav)/launch/rs_camera.launch" />
-  <include file="$(find dashgo_nav)/launch/pCloud2Laser.launch"/>
+  <!--include file="$(find dashgo_nav)/launch/rs_camera.launch" /-->
+  <!--include file="$(find dashgo_nav)/launch/pCloud2Laser.launch"/-->
+  <!--node pkg="tf" type="static_transform_publisher" name="base_link_to_laser4" args="0.1 0.0 0.35 0.0 0.0 0.0 /base_link /camera_link 40" /-->
 
-  <node pkg="tf" type="static_transform_publisher" name="base_link_to_laser4" 
-    args="0.0 0.0 0.0 0.0 3.1415926 0.0 /base_link /camera_link 40" />
+   <include file="$(find dashgo_nav)/launch/rs_camera_f.launch"></include>
+   <node name="front_pointcloud_to_laserscan" pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node">
+        <remap from="cloud_in" to="/front_camera/depth/color/points"/>
+        <remap from="scan" to="/scan"/>
+        <rosparam>
+            target_frame: front_camera_link
+            min_height: -0.1
+            max_height: 1.7
+            range_min: 0.175
+            range_max: 2.0
+        </rosparam>
+   </node>
+
+   <include file="$(find dashgo_nav)/launch/rs_camera_b.launch"></include>
+   <node name="back_pointcloud_to_laserscan" pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node">
+        <remap from="cloud_in" to="/back_camera/depth/color/points"/>
+        <remap from="scan" to="/scan"/>
+        <rosparam>
+            target_frame: back_camera_link
+            min_height: -0.1
+            max_height: 1.7
+            range_min: 0.175
+            range_max: 2.0
+        </rosparam>
+   </node>
+
+   <node pkg="tf" type="static_transform_publisher" name="base_link_to_front_laser4" 
+      args="0.215 0.0 0.19 0.0 0.0  0.0 /base_link /front_camera_link 40" />
+
+   <node pkg="tf" type="static_transform_publisher" name="base_link_to_back_laser4" 
+      args="-0.215 0.0 0.19 0.0 0.0 -3.1415926 /base_link /back_camera_link 40" />
+
   <!-- Map server -->
-  <arg name="map_file" default="$(find dashgo_nav)/maps/my22f_3.yaml"/>
+  <arg name="map_file" default="$(find dashgo_nav)/maps/my22f_4.yaml"/>
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
 
   <arg name="initial_pose_x" default="0.0"/> <!-- Use 17.0 for willow's map in simulation -->

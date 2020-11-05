@@ -1,10 +1,11 @@
+<?xml version="1.0"?>
+
 <launch>
-<!--
-   <node name="arduino" pkg="dashgo_bringup" type="dashgo_driver.py" output="screen">
-      <rosparam file="$(find dashgo_bringup)/config/my_dashgo_params.yaml" command="load" />
-   </node>
--->
+  <node name="arduino" pkg="dashgo_bringup" type="dashgo_driver.py" output="screen">
+     <rosparam file="$(find dashgo_bringup)/config/my_dashgo_params.yaml" command="load" />
+  </node>
   <include file="$(find dashgo_bringup)/launch/bringup_smoother.launch" />
+
   <node name="flashgo"  pkg="flashgo"  type="flashgo_node" output="screen">
   <param name="serial_port"         type="string" value="/dev/flashlidar"/>  
   <param name="serial_baudrate"     type="int"    value="230400"/>
